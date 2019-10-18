@@ -38,7 +38,7 @@
 	        //Sumamos el tamaño para averiguar el peso total de todos los archivos.
 	        $tamanioFichero  =   $_FILES['archivo1']['size'][$i];
 	        $tamañototal = $tamañototal + $tamanioFichero/1024;
-	        echo $tamañototal."<br>";
+	        //echo $tamañototal."<br>";
 	        
 	        //Comprobamos que la imagen no pese más de 200. Si no se excede, sumanos
 	        //uno a tamañoficherobien.
@@ -65,74 +65,80 @@
 	    }
 	    
 	    
-	    //Subimos los ficheros con una serie de comprobaciones previas.
-	    if($todobien2==1){
-	        if($todobien==1){
-	            if($tamañototal<=300){
-	                for( $i=0 ; $i < $total ; $i++ ) {
-	                    $temporalFichero = $_FILES['archivo1']['tmp_name'][$i];
-	                    $nombreFichero   = $_FILES['archivo1']['name'][$i];
-	                    $tipoFichero     = $_FILES['archivo1']['type'][$i];
-	                    $tamanioFichero  = $_FILES['archivo1']['size'][$i];
-	                    $errorFichero    = $_FILES['archivo1']['error'][$i];
-	                    
-	                    $mensaje .= 'Intentando subir el archivo: ' . ' <br>';
-	                    $mensaje .= "- Nombre: $nombreFichero" . ' <br>';
-	                    $mensaje .= '- Tamaño: ' . ($tamanioFichero / 1024) . ' KB <br>';
-	                    $mensaje .= "- Tipo: $tipoFichero" . ' <br />' ;
-	                    //$mensaje .= "- Nombre archivo temporal: $temporalFichero" . ' <br>';
-	                    //$mensaje .= "- Código de estado: $errorFichero" . ' <br>';
-	                    
-	                    
-	                    if ($errorFichero > 0) {
-	                        $mensaje .= "Se a producido el error: $errorFichero:"
-	                        . $codigosErrorSubida[$errorFichero] . ' <br>';
-	                    }
-	                    else { //Subida correcta del temporal
-	                        // Comprobamos si es un directorio y si tengo permisos.
-	                        if (is_dir($directorioSubida) && is_writable($directorioSubida)) {
-	                            //Comprobamos si existe o no ya el fichero.
-	                            if (file_exists($directorioSubida .'/'. $nombreFichero)) {
-	                                $mensaje .= "El fichero $nombreFichero ya existe. Por lo que no se ha subido al servidor.<br>";
-	                            }
-	                            else{
-	                                //Movemos el archivo temporal al directorio indicado
-	                                if (move_uploaded_file($temporalFichero,  $directorioSubida .'/'. $nombreFichero) == true) {
-	                                    $mensaje .= 'Archivo guardado en: ' . $directorioSubida .'/'. $nombreFichero . ' <br><br>';
-	                                } else {
-	                                    $mensaje .= 'ERROR: Archivo no guardado correctamente. <br>';
+	    //Antes de todo comprobamos que solo son dos archivos. Si el usuario
+	    //intenta subir más, te muestra un mensaje impidiendotelo.
+	    if($total>2){
+	        echo "Solo se pueden subir dos archivos.";
+	    }
+	    else{
+	        //Subimos los ficheros con una serie de comprobaciones previas. 
+	        if($todobien2==1){
+	            if($todobien==1){
+	                if($tamañototal<=300){
+	                    for( $i=0 ; $i < $total ; $i++ ) {
+	                        $temporalFichero = $_FILES['archivo1']['tmp_name'][$i];
+	                        $nombreFichero   = $_FILES['archivo1']['name'][$i];
+	                        $tipoFichero     = $_FILES['archivo1']['type'][$i];
+	                        $tamanioFichero  = $_FILES['archivo1']['size'][$i];
+	                        $errorFichero    = $_FILES['archivo1']['error'][$i];
+	                        
+	                        $mensaje .= 'Intentando subir el archivo: ' . ' <br>';
+	                        $mensaje .= "- Nombre: $nombreFichero" . ' <br>';
+	                        $mensaje .= '- Tamaño: ' . ($tamanioFichero / 1024) . ' KB <br>';
+	                        $mensaje .= "- Tipo: $tipoFichero" . ' <br />' ;
+	                        //$mensaje .= "- Nombre archivo temporal: $temporalFichero" . ' <br>';
+	                        //$mensaje .= "- Código de estado: $errorFichero" . ' <br>';
+	                        
+	                        
+	                        if ($errorFichero > 0) {
+	                            $mensaje .= "Se a producido el error: $errorFichero:"
+	                            . $codigosErrorSubida[$errorFichero] . ' <br>';
+	                        }
+	                        else { //Subida correcta del temporal
+	                            // Comprobamos si es un directorio y si tengo permisos.
+	                            if (is_dir($directorioSubida) && is_writable($directorioSubida)) {
+	                                //Comprobamos si existe o no ya el fichero.
+	                                if (file_exists($directorioSubida .'/'. $nombreFichero)) {
+	                                    $mensaje .= "El fichero $nombreFichero ya existe. Por lo que no se ha subido al servidor.<br>";
+	                                }
+	                                else{
+	                                    //Movemos el archivo temporal al directorio indicado
+	                                    if (move_uploaded_file($temporalFichero,  $directorioSubida .'/'. $nombreFichero) == true) {
+	                                        $mensaje .= 'Archivo guardado en: ' . $directorioSubida .'/'. $nombreFichero . ' <br><br>';
+	                                    } else {
+	                                        $mensaje .= 'ERROR: Archivo no guardado correctamente. <br>';
+	                                    }
 	                                }
 	                            }
-	                        }
-	                        else {
-	                            $mensaje .= 'ERROR: No es un directorio correcto o no se tiene permiso de escritura. <br>';
+	                            else {
+	                                $mensaje .= 'ERROR: No es un directorio correcto o no se tiene permiso de escritura. <br>';
+	                            }
 	                        }
 	                    }
+	                    echo $mensaje;
 	                }
-	                echo $mensaje;
+	                //Else de tamañototal.
+	                else{
+	                    echo "El tamaño de ambos ficheros se excede del limite de subida(300).";
+	                }
 	            }
-	            //Else de tamañototal.
+	            //Else de todobien(tipoarchivobien)
 	            else{
-	                echo "El tamaño de ambos ficheros se excede del limite de subida(300).";
+	                if($total == 1){
+	                    echo "El fichero no es ni png ni jpg.";
+	                }else{
+	                    echo "Alguno de los ficheros no es ni png ni jpg.";
+	                }
 	            }
 	        }
-	        //Else de todobien(tipoarchivobien)
+	        //Else de todobien2(tamañoarchivobien)
 	        else{
 	            if($total == 1){
-	                echo "El fichero no es ni png ni jpg.";
+	                echo "El fichero se excede del limite(200).";
 	            }else{
-	                echo "Alguno de los ficheros no es ni png ni jpg.";
+	                echo "Alguno de los ficheros se excede del limite(200).";
 	            }
 	        }
-	    }
-	    //Else de todobien2(tamañoarchivobien)
-	    else{
-	        if($total == 1){
-	            echo "El fichero se excede del limite(200).";
-	        }else{
-	            echo "Alguno de los ficheros se excede del limite(200).";
-	        }
-	    }
-		
+	    }	
 	}	
     ?>
